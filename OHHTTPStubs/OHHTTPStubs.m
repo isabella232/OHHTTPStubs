@@ -238,15 +238,30 @@
             NSArray* cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:responseStub.httpHeaders forURL:request.URL];
             [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookies:cookies forURL:request.URL mainDocumentURL:request.mainDocumentURL];
         }
-        
-        execute_after(requestTime,^{
-            [client URLProtocol:self didReceiveResponse:urlResponse cacheStoragePolicy:NSURLCacheStorageNotAllowed];
-            
-            execute_after(responseTime,^{
-                [client URLProtocol:self didLoadData:responseStub.responseData];
-                [client URLProtocolDidFinishLoading:self];
-            });
-        });
+
+        NSString *redirectLocation = responseStub.httpHeaders[@"Location"];
+        NSURL *redirectURL = (redirectLocation != nil ? [NSURL URLWithString:redirectLocation] : nil);
+        NSInteger statusCode = responseStub.statusCode;
+
+        void (^requestBlock)(void);
+        if (statusCode >= 300 && statusCode < 400 && redirectURL) {
+            NSURLRequest* redirectRequest = [NSURLRequest requestWithURL:redirectURL];
+
+            requestBlock = ^{
+                [client URLProtocol:self wasRedirectedToRequest:redirectRequest redirectResponse:urlResponse];
+            };
+        } else {
+            requestBlock = ^{
+                [client URLProtocol:self didReceiveResponse:urlResponse cacheStoragePolicy:NSURLCacheStorageNotAllowed];
+
+                execute_after(responseTime,^{
+                    [client URLProtocol:self didLoadData:responseStub.responseData];
+                    [client URLProtocolDidFinishLoading:self];
+                });
+            };
+        }
+
+        execute_after(requestTime, requestBlock);
     } else {
         // Send the canned error
         execute_after(responseStub.responseTime, ^{
@@ -272,3 +287,4 @@ void execute_after(NSTimeInterval delayInSeconds, dispatch_block_t block)
 }
 
 @end
+
