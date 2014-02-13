@@ -249,7 +249,7 @@
 
             requestBlock = ^{
                 [client URLProtocol:self wasRedirectedToRequest:redirectRequest redirectResponse:urlResponse];
-            }
+            };
         } else {
             requestBlock = ^{
                 [client URLProtocol:self didReceiveResponse:urlResponse cacheStoragePolicy:NSURLCacheStorageNotAllowed];
@@ -258,9 +258,7 @@
                     [client URLProtocol:self didLoadData:responseStub.responseData];
                     [client URLProtocolDidFinishLoading:self];
                 });
-            }
-
-
+            };
         }
 
         execute_after(requestTime, requestBlock);
