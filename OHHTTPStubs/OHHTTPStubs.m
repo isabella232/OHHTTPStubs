@@ -282,11 +282,8 @@
 //! execute the block after a given amount of seconds
 void execute_after(NSTimeInterval delayInSeconds, dispatch_block_t block)
 {
-    /* We know that -[NSURLProtocol startLoading] is called on a dedicated thread that has a runloop, so that there is no problem firing a timer here
-	@note We use the '-invoke' method (private API) because it is handy and OHHTTPStubs will never be used in production code anyway
-	*/
-    dispatch_block_t blockCopy = [block copy];
-    [NSTimer scheduledTimerWithTimeInterval:delayInSeconds target:blockCopy selector:@selector(invoke) userInfo:nil repeats:NO];
+	dispatch_queue_t queue = dispatch_queue_create("OHHTTPStubs", 0);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)), queue, block);
 }
 
 @end
