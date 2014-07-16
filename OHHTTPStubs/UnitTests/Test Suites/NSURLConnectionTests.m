@@ -62,7 +62,7 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
 
 -(void)test_NSURLConnection_sendSyncronousRequest_parallelQueue
 {
-    [[[NSOperationQueue alloc] init] addOperationWithBlock:^{
+    [self.queue addOperationWithBlock:^{
         [self test_NSURLConnection_sendSyncronousRequest_mainQueue];
         [self notifyAsyncOperationDone];
     }];
@@ -111,7 +111,7 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
 
 -(void)test_NSURLConnection_sendAsyncronousRequest_parallelQueue
 {
-    [self _test_NSURLConnection_sendAsyncronousRequest_onOperationQueue:[[NSOperationQueue alloc] init]];
+    [self _test_NSURLConnection_sendAsyncronousRequest_onOperationQueue:self.queue];
 }
 
 
@@ -168,7 +168,7 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
 
 -(void)test_NSURLConnection_sendMultipleAsyncronousRequests_parallelQueue
 {
-    [self _test_NSURLConnection_sendMultipleAsyncronousRequestsOnOperationQueue:[[NSOperationQueue alloc] init]];
+    [self _test_NSURLConnection_sendMultipleAsyncronousRequestsOnOperationQueue:self.queue];
 }
 
 @end

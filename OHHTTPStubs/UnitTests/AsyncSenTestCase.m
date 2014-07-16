@@ -35,6 +35,14 @@
 
 @synthesize asyncTestCaseSignaledCount = _asyncTestCaseSignaledCount;
 
+- (void)setUp {
+	_queue = [[NSOperationQueue alloc] init];
+}
+
+- (void)tearDown {
+	_queue = nil;
+}
+
 -(void)waitForAsyncOperationWithTimeout:(NSTimeInterval)timeout
 {
     [self waitForAsyncOperations:1 withTimeout:timeout];
