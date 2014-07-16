@@ -56,13 +56,13 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
     
     NSData* data = [NSURLConnection sendSynchronousRequest:req returningResponse:NULL error:NULL];
     
-    STAssertEqualObjects(data, testData, @"Invalid data response");
-    STAssertEqualsWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
+    XCTAssertEqualObjects(data, testData, @"Invalid data response");
+    XCTAssertEqualWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
 }
 
 -(void)test_NSURLConnection_sendSyncronousRequest_parallelQueue
 {
-    [[[[NSOperationQueue alloc] init] autorelease] addOperationWithBlock:^{
+    [[[NSOperationQueue alloc] init] addOperationWithBlock:^{
         [self test_NSURLConnection_sendSyncronousRequest_mainQueue];
         [self notifyAsyncOperationDone];
     }];
@@ -93,8 +93,8 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
     
     [NSURLConnection sendAsynchronousRequest:req queue:queue completionHandler:^(NSURLResponse* resp, NSData* data, NSError* error)
      {
-         STAssertEqualObjects(data, testData, @"Invalid data response");
-         STAssertEqualsWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
+         XCTAssertEqualObjects(data, testData, @"Invalid data response");
+         XCTAssertEqualWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
          
          [self notifyAsyncOperationDone];
      }];
@@ -111,7 +111,7 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
 
 -(void)test_NSURLConnection_sendAsyncronousRequest_parallelQueue
 {
-    [self _test_NSURLConnection_sendAsyncronousRequest_onOperationQueue:[[[NSOperationQueue alloc] init] autorelease]];
+    [self _test_NSURLConnection_sendAsyncronousRequest_onOperationQueue:[[NSOperationQueue alloc] init]];
 }
 
 
@@ -141,13 +141,14 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
     {
         NSString* urlString = [NSString stringWithFormat:@"http://dummyrequest/concurrent/time/%f",responseTime];
         NSURLRequest* req = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
-        [SenTestLog testLogWithFormat:@"== Sending request %@\n", req];
+		XCTestLog *testLog = [[XCTestLog alloc] init];
+        [testLog testLogWithFormat:@"== Sending request %@\n", req];
         NSDate* startDate = [NSDate date];
         [NSURLConnection sendAsynchronousRequest:req queue:queue completionHandler:^(NSURLResponse* resp, NSData* data, NSError* error)
          {
-             [SenTestLog testLogWithFormat:@"== Received response for request %@\n", req];
-             STAssertEqualObjects(data, dataForRequest(req), @"Invalid data response");
-             STAssertEqualsWithAccuracy(-[startDate timeIntervalSinceNow], responseTime, kResponseTimeTolerence, @"Invalid response time");
+             [testLog testLogWithFormat:@"== Received response for request %@\n", req];
+             XCTAssertEqualObjects(data, dataForRequest(req), @"Invalid data response");
+             XCTAssertEqualWithAccuracy(-[startDate timeIntervalSinceNow], responseTime, kResponseTimeTolerence, @"Invalid response time");
              
              [self notifyAsyncOperationDone];
          }];
@@ -167,7 +168,7 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
 
 -(void)test_NSURLConnection_sendMultipleAsyncronousRequests_parallelQueue
 {
-    [self _test_NSURLConnection_sendMultipleAsyncronousRequestsOnOperationQueue:[[[NSOperationQueue alloc] init] autorelease]];
+    [self _test_NSURLConnection_sendMultipleAsyncronousRequestsOnOperationQueue:[[NSOperationQueue alloc] init]];
 }
 
 @end

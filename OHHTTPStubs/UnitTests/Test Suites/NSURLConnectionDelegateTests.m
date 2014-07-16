@@ -48,12 +48,10 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
 
 -(void)tearDown
 {
-    [_data release];
     // in case the test timed out and finished before a running NSURLConnection ended,
     // we may continue receive delegate messages anyway if we forgot to cancel.
     // So avoid sending messages to deallocated object in this case by ensuring we reset it to nil
     _data = nil;
-    [_error release];
     _error = nil;
     [super tearDown];
 }
@@ -70,7 +68,7 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
 
 -(void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    _error = [error retain];
+    _error = error;
     [self notifyAsyncOperationDone];
 }
 
@@ -106,9 +104,9 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
     
     [self waitForAsyncOperationWithTimeout:kResponseTime+kResponseTimeTolerence];
     
-    STAssertEqualObjects(_data, testData, @"Invalid data response");
-    STAssertNil(_error, @"Received unexpected network error %@", _error);
-    STAssertEqualsWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
+    XCTAssertEqualObjects(_data, testData, @"Invalid data response");
+    XCTAssertNil(_error, @"Received unexpected network error %@", _error);
+    XCTAssertEqualWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
     
     // in case we timed out before the end of the request (test failed), cancel the request to avoid further delegate method calls
     [cxn cancel];
@@ -134,10 +132,10 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
     
     [self waitForAsyncOperationWithTimeout:kResponseTime+kResponseTimeTolerence];
     
-    STAssertEquals(_data.length, 0U, @"Received unexpected network data %@", _data);
-    STAssertEqualObjects(_error.domain, expectedError.domain, @"Invalid error response domain");
-    STAssertEquals(_error.code, expectedError.code, @"Invalid error response code");
-    STAssertEqualsWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
+    XCTAssertEqual(_data.length, 0U, @"Received unexpected network data %@", _data);
+    XCTAssertEqualObjects(_error.domain, expectedError.domain, @"Invalid error response domain");
+    XCTAssertEqual(_error.code, expectedError.code, @"Invalid error response code");
+    XCTAssertEqualWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
     
     // in case we timed out before the end of the request (test failed), cancel the request to avoid further delegate method calls
     [cxn cancel];
@@ -166,8 +164,8 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
     [cxn cancel];
     [self waitForTimeout:1.5];
     
-    STAssertEquals(_data.length, 0U, @"Received unexpected data but the request should have been cancelled");
-    STAssertNil(_error, @"Received unexpected network error but the request should have been cancelled");
+    XCTAssertEqual(_data.length, 0U, @"Received unexpected data but the request should have been cancelled");
+    XCTAssertNil(_error, @"Received unexpected network error but the request should have been cancelled");
     
     // in case we timed out before the end of the request (test failed), cancel the request to avoid further delegate method calls
     [cxn cancel];
@@ -214,10 +212,10 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
         if ([cookie.name isEqualToString:cookieName])
         {
             cookieFound = YES;
-            STAssertEqualObjects(cookie.value, cookieValue, @"The cookie does not have the expected value");
+            XCTAssertEqualObjects(cookie.value, cookieValue, @"The cookie does not have the expected value");
         }
     }
-    STAssertTrue(cookieFound, @"The cookie was not stored as expected");
+    XCTAssertTrue(cookieFound, @"The cookie was not stored as expected");
     
 
     // As a courtesy, restore previous policy before leaving

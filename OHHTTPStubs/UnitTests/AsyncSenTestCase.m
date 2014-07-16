@@ -56,7 +56,7 @@
     if ([timeoutDate timeIntervalSinceNow]<0)
     {
         // now is after timeoutDate, we timed out
-        STFail(@"Timed out while waiting for Async Operations to finish.");
+        XCTFail(@"Timed out while waiting for Async Operations to finish.");
     }
 }
 
