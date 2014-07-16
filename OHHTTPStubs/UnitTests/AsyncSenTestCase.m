@@ -35,6 +35,14 @@
 
 @synthesize asyncTestCaseSignaledCount = _asyncTestCaseSignaledCount;
 
+- (void)setUp {
+	_queue = [[NSOperationQueue alloc] init];
+}
+
+- (void)tearDown {
+	_queue = nil;
+}
+
 -(void)waitForAsyncOperationWithTimeout:(NSTimeInterval)timeout
 {
     [self waitForAsyncOperations:1 withTimeout:timeout];
@@ -56,7 +64,7 @@
     if ([timeoutDate timeIntervalSinceNow]<0)
     {
         // now is after timeoutDate, we timed out
-        STFail(@"Timed out while waiting for Async Operations to finish.");
+        XCTFail(@"Timed out while waiting for Async Operations to finish.");
     }
 }
 

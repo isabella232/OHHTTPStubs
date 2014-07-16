@@ -59,13 +59,13 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
                                             encoding:NSUTF8StringEncoding
                                                error:NULL];
     
-    STAssertEqualObjects(string, testString, @"Invalid returned string");
-    STAssertEqualsWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
+    XCTAssertEqualObjects(string, testString, @"Invalid returned string");
+    XCTAssertEqualWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
 }
 
 -(void)test_NSString_stringWithContentsOfURL_parallelQueue
 {
-    [[[[NSOperationQueue alloc] init] autorelease] addOperationWithBlock:^{
+    [self.queue addOperationWithBlock:^{
         [self test_NSString_stringWithContentsOfURL_mainQueue];
         [self notifyAsyncOperationDone];
     }];
@@ -94,13 +94,13 @@ static const NSTimeInterval kResponseTimeTolerence = 0.2;
     
     NSData* data = [NSData dataWithContentsOfURL:[NSURL URLWithString:@"http://www.iana.org/domains/example/"]];
     
-    STAssertEqualObjects(data, testData, @"Invalid returned string");
-    STAssertEqualsWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
+    XCTAssertEqualObjects(data, testData, @"Invalid returned string");
+    XCTAssertEqualWithAccuracy(-[startDate timeIntervalSinceNow], kResponseTime, kResponseTimeTolerence, @"Invalid response time");
 }
 
 -(void)test_NSData_dataWithContentsOfURL_parallelQueue
 {
-    [[[[NSOperationQueue alloc] init] autorelease] addOperationWithBlock:^{
+    [self.queue addOperationWithBlock:^{
         [self test_NSData_dataWithContentsOfURL_mainQueue];
         [self notifyAsyncOperationDone];
     }];
