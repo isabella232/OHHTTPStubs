@@ -190,7 +190,7 @@
         canInitWithRequest = response != nil;
         if (canInitWithRequest) *stop = YES;
     }];
-	NSLog(@"%@-%@ %@ init %@)", NSStringFromSelector(_cmd), @(__LINE__), (canInitWithRequest ? @"CAN" : @"CANNOT"), request);
+	NSLog(@"%@-%@ %@ init %@", NSStringFromSelector(_cmd), @(__LINE__), (canInitWithRequest ? @"CAN" : @"CANNOT"), request);
     return canInitWithRequest;
 }
 
@@ -258,7 +258,7 @@
                 execute_after(responseTime,^{
                     [client URLProtocol:self didLoadData:responseStub.responseData];
                     [client URLProtocolDidFinishLoading:self];
-					NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
+					NSLog(@"%@-%@ (%@: %@)", NSStringFromSelector(_cmd), @(__LINE__), request, client);
                 });
             };
         }
@@ -268,7 +268,7 @@
         // Send the canned error
         execute_after(responseStub.responseTime, ^{
             [client URLProtocol:self didFailWithError:responseStub.error];
-			NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
+			NSLog(@"%@-%@ (%@: %@)", NSStringFromSelector(_cmd), @(__LINE__), request, client);
         });
     }
 }
