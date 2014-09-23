@@ -255,11 +255,17 @@
             requestBlock = ^{
                 [client URLProtocol:self didReceiveResponse:urlResponse cacheStoragePolicy:NSURLCacheStorageNotAllowed];
 				
-                execute_after(responseTime,^{
+				if (responseTime == 0) {
                     [client URLProtocol:self didLoadData:responseStub.responseData];
                     [client URLProtocolDidFinishLoading:self];
 					NSLog(@"%@-%@ (%@: %@)", NSStringFromSelector(_cmd), @(__LINE__), request, client);
-                });
+				} else {
+					execute_after(responseTime,^{
+						[client URLProtocol:self didLoadData:responseStub.responseData];
+						[client URLProtocolDidFinishLoading:self];
+						NSLog(@"%@-%@ (%@: %@)", NSStringFromSelector(_cmd), @(__LINE__), request, client);
+					});
+				}
             };
         }
 		
