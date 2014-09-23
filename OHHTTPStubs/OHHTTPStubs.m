@@ -219,7 +219,6 @@
         responseStub = handler(request, NO);
         if (responseStub != nil) *stop = YES;
     }];
-	NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
     
     if (responseStub.error == nil) {
         // Send the fake data
@@ -234,8 +233,7 @@
         NSTimeInterval requestTime = fabs(canonicalResponseTime * 0.1);
         NSTimeInterval responseTime = fabs(canonicalResponseTime - requestTime);
         
-		NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
-        NSHTTPURLResponse* urlResponse = [[NSHTTPURLResponse alloc] initWithURL:request.URL statusCode:responseStub.statusCode HTTPVersion:@"HTTP/1.1" headerFields:responseStub.httpHeaders];
+		NSHTTPURLResponse* urlResponse = [[NSHTTPURLResponse alloc] initWithURL:request.URL statusCode:responseStub.statusCode HTTPVersion:@"HTTP/1.1" headerFields:responseStub.httpHeaders];
 		NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
         
         // Cookies handling
@@ -243,14 +241,12 @@
             NSArray* cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:responseStub.httpHeaders forURL:request.URL];
             [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookies:cookies forURL:request.URL mainDocumentURL:request.mainDocumentURL];
         }
-		NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
 
         NSString *redirectLocation = responseStub.httpHeaders[@"Location"];
         NSURL *redirectURL = (redirectLocation != nil ? [NSURL URLWithString:redirectLocation] : nil);
         NSInteger statusCode = responseStub.statusCode;
 		
-		NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
-        void (^requestBlock)(void);
+		void (^requestBlock)(void);
         if (statusCode >= 300 && statusCode < 400 && redirectURL) {
             NSURLRequest* redirectRequest = [NSURLRequest requestWithURL:redirectURL];
 			
@@ -259,12 +255,10 @@
                 [client URLProtocol:self wasRedirectedToRequest:redirectRequest redirectResponse:urlResponse];
             };
         } else {
-			NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
             requestBlock = ^{
 				NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
                 [client URLProtocol:self didReceiveResponse:urlResponse cacheStoragePolicy:NSURLCacheStorageNotAllowed];
 				
-				NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
                 execute_after(responseTime,^{
 					NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
                     [client URLProtocol:self didLoadData:responseStub.responseData];
