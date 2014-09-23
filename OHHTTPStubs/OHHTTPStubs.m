@@ -190,6 +190,7 @@
         canInitWithRequest = response != nil;
         if (canInitWithRequest) *stop = YES;
     }];
+	NSLog(@"%@-%@ %@ init %@)", NSStringFromSelector(_cmd), @(__LINE__), (canInitWithRequest ? @"CAN" : @"CANNOT"), request);
     return canInitWithRequest;
 }
 
@@ -214,7 +215,6 @@
     
     __block OHHTTPStubsResponse *responseStub = nil;
     
-	NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
     [OHHTTPStubs.sharedInstance enumerateRequestHandlersWithBlock:^(OHHTTPStubsRequestHandler handler, BOOL *stop) {
         responseStub = handler(request, NO);
         if (responseStub != nil) *stop = YES;
@@ -248,7 +248,6 @@
         if (statusCode >= 300 && statusCode < 400 && redirectURL) {
             NSURLRequest* redirectRequest = [NSURLRequest requestWithURL:redirectURL];
 			
-			NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
             requestBlock = ^{
                 [client URLProtocol:self wasRedirectedToRequest:redirectRequest redirectResponse:urlResponse];
             };
@@ -264,7 +263,6 @@
             };
         }
 		
-		NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
         execute_after(requestTime, requestBlock);
     } else {
         // Send the canned error
