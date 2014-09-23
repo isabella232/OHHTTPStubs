@@ -285,9 +285,8 @@
 //! execute the block after a given amount of seconds
 void execute_after(NSTimeInterval delayInSeconds, dispatch_block_t block)
 {
-	dispatch_queue_t queue = dispatch_queue_create("OHHTTPStubs", 0);
 	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-	dispatch_after(popTime, queue, block);
+	dispatch_after(popTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), block);
 }
 
 @end
