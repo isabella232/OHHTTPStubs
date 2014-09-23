@@ -223,7 +223,6 @@
     if (responseStub.error == nil) {
         // Send the fake data
         
-		NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
         NSTimeInterval canonicalResponseTime = responseStub.responseTime;
         if (canonicalResponseTime < 0) {
             // Interpret it as a bandwidth in KB/s ( -2 => 2KB/s )
@@ -234,7 +233,6 @@
         NSTimeInterval responseTime = fabs(canonicalResponseTime - requestTime);
         
 		NSHTTPURLResponse* urlResponse = [[NSHTTPURLResponse alloc] initWithURL:request.URL statusCode:responseStub.statusCode HTTPVersion:@"HTTP/1.1" headerFields:responseStub.httpHeaders];
-		NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
         
         // Cookies handling
         if (request.HTTPShouldHandleCookies) {
@@ -271,6 +269,7 @@
         execute_after(requestTime, requestBlock);
     } else {
         // Send the canned error
+		NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
         execute_after(responseStub.responseTime, ^{
             [client URLProtocol:self didFailWithError:responseStub.error];
         });
