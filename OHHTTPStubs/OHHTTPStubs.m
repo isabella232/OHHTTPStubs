@@ -254,13 +254,12 @@
             };
         } else {
             requestBlock = ^{
-				NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
                 [client URLProtocol:self didReceiveResponse:urlResponse cacheStoragePolicy:NSURLCacheStorageNotAllowed];
 				
                 execute_after(responseTime,^{
-					NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
                     [client URLProtocol:self didLoadData:responseStub.responseData];
                     [client URLProtocolDidFinishLoading:self];
+					NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
                 });
             };
         }
@@ -269,9 +268,9 @@
         execute_after(requestTime, requestBlock);
     } else {
         // Send the canned error
-		NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
         execute_after(responseStub.responseTime, ^{
             [client URLProtocol:self didFailWithError:responseStub.error];
+			NSLog(@"%@-%@ (%@)", NSStringFromSelector(_cmd), @(__LINE__), request);
         });
     }
 }
