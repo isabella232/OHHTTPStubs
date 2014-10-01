@@ -47,12 +47,12 @@
 + (OHHTTPStubs*)sharedInstance
 {
     static OHHTTPStubs *sharedInstance = nil;
-    
+
     static dispatch_once_t predicate;
     dispatch_once(&predicate, ^{
         sharedInstance = [[self alloc] init];
     });
-    
+
     return sharedInstance;
 }
 
@@ -144,7 +144,7 @@
 -(BOOL)removeRequestHandler:(id)handler
 {
     BOOL handlerFound = NO;
-    
+
     @synchronized(self) {
         handlerFound = [_requestHandlers containsObject:handler];
         [_requestHandlers removeObject:handler];
@@ -167,7 +167,7 @@
 
 - (void)enumerateRequestHandlersWithBlock:(void(^)(OHHTTPStubsRequestHandler handler, BOOL *stop))enumerationBlock {
     NSCParameterAssert(enumerationBlock != nil);
-    
+
     @synchronized(self) {
         [_requestHandlers enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             enumerationBlock(obj, stop);
@@ -211,17 +211,17 @@
 - (void)startLoading {
     NSURLRequest* request = [self request];
 	id<NSURLProtocolClient> client = [self client];
-    
+
     __block OHHTTPStubsResponse *responseStub = nil;
-    
+
     [OHHTTPStubs.sharedInstance enumerateRequestHandlersWithBlock:^(OHHTTPStubsRequestHandler handler, BOOL *stop) {
         responseStub = handler(request, NO);
         if (responseStub != nil) *stop = YES;
     }];
-    
+
     if (responseStub.error == nil) {
         // Send the fake data
-        
+
         NSTimeInterval canonicalResponseTime = responseStub.responseTime;
         if (canonicalResponseTime < 0) {
             // Interpret it as a bandwidth in KB/s ( -2 => 2KB/s )
@@ -230,9 +230,9 @@
         }
         NSTimeInterval requestTime = fabs(canonicalResponseTime * 0.1);
         NSTimeInterval responseTime = fabs(canonicalResponseTime - requestTime);
-        
+
         NSHTTPURLResponse* urlResponse = [[NSHTTPURLResponse alloc] initWithURL:request.URL statusCode:responseStub.statusCode HTTPVersion:@"HTTP/1.1" headerFields:responseStub.httpHeaders];
-        
+
         // Cookies handling
         if (request.HTTPShouldHandleCookies) {
             NSArray* cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:responseStub.httpHeaders forURL:request.URL];
@@ -282,10 +282,12 @@
 //! execute the block after a given amount of seconds
 void execute_after(NSTimeInterval delayInSeconds, dispatch_block_t block)
 {
-	dispatch_queue_t queue = dispatch_queue_create("OHHTTPStubs", 0);
-	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-	dispatch_after(popTime, queue, block);
+    if (delayInSeconds > 0) {
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_current_queue(), block);
+    } else {
+        block();
+    }
 }
 
 @end
-
